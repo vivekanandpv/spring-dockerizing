@@ -1,23 +1,11 @@
-# We take the base container
-# For maximum compatibility I have selected openjdk 8 on alpine (linux)
-FROM openjdk:8-jdk-alpine
-
-# Add a volume pointing to /tmp
-VOLUME /tmp
-
-# Exposing port 8080 of the container
+FROM tomcat:latest
+ADD target/spring-dockerizing-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/app.war
 EXPOSE 8080
-
-# Set the jar file variable
-ARG JAR_FILE=target/spring-dockerizing-0.0.1-SNAPSHOT.jar
-
-# copy jar file to the container
-ADD ${JAR_FILE} spring-dockerizing.jar
-
-# mention the entrypoint for the container
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/spring-dockerizing.jar"]
-
+CMD ["catalina.sh", "run"]
+# make sure first you run the command: mvn clean package (this will clean as well as build)
 # command to build:  docker build -t <image-name> .
 # command to run: docker run -p 3001:8080 <image-name>
 # 8080 is the internally (in the container) exposed port
 # 3001 is the externally (in the host computer) exposed port
+# since this is deployed to tomcat, the path will be localhost:3001/app
+# reason is, we renamed the long artifcat (war) name to app.war
